@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedAssist - Your Health Navigator</title>
+    <link rel="stylesheet" href="medassist.css">
+    <style>
+        /* Pink-themed styling */
+        body {
+            background-color: #ffe6f2;
+            color: #660033;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #ff66b2;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #fff;
+        }
+
+        nav {
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #ff1a75;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #cc0066;
+        }
+
+        section {
+            margin-top: 20px;
+        }
+
+        /* Chatbot icon styling */
+        .chatbot-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #ff1a75;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+
+        .chatbot-icon:hover {
+            background-color: #cc0066;
+        }
+
+        /* Chatbot modal styling */
+        .chat-container {
+            width: 350px;
+            height: 500px;
+            border-radius: 15px;
+            background-color: #fff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            transition: all 0.3s ease;
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            display: none;
+        }
+
+        .chat-header {
+            background-color: #ff66b2;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .chat-window {
+            padding: 15px;
+            overflow-y: auto;
+            flex: 1;
+            height: 250px;
+            background-color: #ffe6f7;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: inset 0 2px 15px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            font-family: 'Verdana', sans-serif;
+        }
+
+        #user-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ff66b2;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            outline: none;
+            color: #333;
+        }
+
+        #send-btn {
+            background-color: #ff66b2;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .suggestions {
+            padding: 10px;
+            background-color: #ffe6f7;
+            border: 2px solid #ff66b2;
+            border-radius: 10px;
+            display: none;
+            margin-top: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .suggestion-item {
+            margin: 8px 0;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .suggestion-item:hover {
+            background-color: #ffebf2;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Navigation Section -->
+    <header>
+        <h1>MedAssist - Your Health Navigator</h1>
+        <nav>
+            <button onclick="openWindow('index (2).html')">Ambulance Locator</button>
+            <button onclick="openWindow('index (3).html')">Hospital Locator</button>
+            <button onclick="openWindow('RTN.html')">Real-Time Navigation</button>
+        </nav>
+    </header>
+
+    <section>
+        <p>Welcome to MedAssist, your one-stop solution for emergency health services at your fingertips.</p>
+    </section>
+
+    <!-- Chatbot icon button -->
+    <div class="chatbot-icon" onclick="toggleChatbot()">
+        💬
+    </div>
+
+    <!-- Chatbot Modal -->
+    <div class="chat-container" id="chatbot-modal">
+        <div class="chat-header">MedAssist Chatbot</div>
+        <div class="chat-window" id="chat-window"></div>
+        <input type="text" id="user-input" placeholder="Type a message..." oninput="showSuggestions()">
+        <button id="send-btn">Send</button>
+        <div class="suggestions" id="suggestions"></div>
+    </div>
+
+    <!-- JavaScript Integration from chatboot.js with suggestions functionality -->
+    <script>
+        const firstAidDatabase = {
+            "heart attack": "Call ambulance immediately. Keep patient calm and comfortable.",
+            "head injury": "Apply ice pack. Monitor for concussion symptoms.",
+            "burns": "Run cool water over burn. Cover with non-stick dressing.",
+            "fracture": "Immobilize the injured area. Apply ice and seek medical attention.",
+            "bleeding": "Apply pressure on the wound. Elevate the injured limb.",
+            "dizziness": "Sit or lie down. Drink water and rest.",
+            "choking": "Perform the Heimlich maneuver. Call for help immediately.",
+            "allergic reaction": "Use antihistamines if available. Seek medical help if symptoms worsen.",
+            "hypothermia": "Warm the person slowly. Provide blankets and warm drinks.",
+            "heatstroke": "Move to a cooler place. Hydrate and cool the body with ice packs.",
+            "severe headache": "Rest in a dark room. Take over-the-counter painkillers if needed.",
+            "nosebleed": "Pinch the nostrils and lean forward. Avoid tilting the head back.",
+            "diabetic emergency": "Give sugar or glucose if the person is conscious. Call for help.",
+            "asthma attack": "Use inhaler. Sit upright and breathe slowly.",
+            "severe abdominal pain": "Rest. Seek medical attention if pain persists or worsens.",
+            "seizure": "Clear the area around the person. Do not hold them down. Call for help.",
+            "poisoning": "Call poison control immediately. If the substance is ingested, do not induce vomiting.",
+            "stroke": "Recognize the signs: facial drooping, arm weakness, and speech difficulty. Call for help.",
+            "animal bite": "Clean the wound and apply pressure to stop bleeding. Seek medical help.",
+            "eye injury": "Rinse with clean water. Cover with a sterile dressing and seek medical help."
+        };
+
+        function toggleChatbot() {
+            const chatbotModal = document.getElementById("chatbot-modal");
+            chatbotModal.style.display = chatbotModal.style.display === "none" ? "flex" : "none";
+        }
+
+        document.getElementById("send-btn").addEventListener("click", () => {
+            const userInput = document.getElementById("user-input").value.trim();
+            const response = getResponse(userInput);
+            document.getElementById("chat-window").innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+            document.getElementById("chat-window").innerHTML += `<p><strong>MedAssist:</strong> ${response}</p>`;
+            document.getElementById("user-input").value = "";
+            document.getElementById("chat-window").scrollTop = document.getElementById("chat-window").scrollHeight;
+            document.getElementById("suggestions").style.display = "none";
+        });
+
+        function showSuggestions() {
+            const userInput = document.getElementById("user-input").value.trim().toLowerCase();
+            const suggestionsBox = document.getElementById("suggestions");
+            suggestionsBox.innerHTML = '';
+
+            if (userInput.length > 0) {
+                let suggestions = [];
+                for (const condition in firstAidDatabase) {
+                    if (condition.includes(userInput)) {
+                        suggestions.push(condition);
+                    }
+                }
+                if (suggestions.length > 0) {
+                    suggestions.forEach(suggestion => {
+                        const suggestionElement = document.createElement("div");
+                        suggestionElement.classList.add("suggestion-item");
+                        suggestionElement.innerText = suggestion;
+                        suggestionElement.onclick = () => {
+                            document.getElementById("user-input").value = suggestion;
+                            suggestionsBox.style.display = 'none';
+                        };
+                        suggestionsBox.appendChild(suggestionElement);
+                    });
+                    suggestionsBox.style.display = 'block';
+                } else {
+                    suggestionsBox.style.display = 'none';
+                }
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        }
+
+        function getResponse(userInput) {
+            userInput = userInput.toLowerCase();
+            for (const condition in firstAidDatabase) {
+                if (userInput.includes(condition)) {
+                    return firstAidDatabase[condition];
+                }
+            }
+            return "Sorry, I'm not sure about that. Please provide more information.";
+        }
+
+        function openWindow(page) {
+            window.open(page, '_blank', 'width=1000,height=700');
+        }
+    </script>
+</body>
+</html>
